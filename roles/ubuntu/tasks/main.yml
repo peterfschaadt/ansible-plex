@@ -1,0 +1,47 @@
+---
+# Tasks for Ubuntu role
+
+- name: Set hostname on Plex server
+  hostname:
+    name={{ hostname }}
+
+- name: Create user groups on Plex server
+  group:
+    name={{ item.name }}
+    system={{ item.system }}
+    state=present
+  with_items: user_groups
+
+- name: Create user accounts on Plex server
+  user:
+    name={{ item.key }}
+    comment={{ item.value.name }}
+    group={{ item.value.group }}
+  with_dict: users
+
+- name: Add authorized_keys on Plex server
+  authorized_key:
+    user={{ item.key }}
+    key={{ item.value }}
+  with_dict: authorized_keys
+
+- name: Install basic apps
+  apt:
+    name={{ item.name }}
+    state=latest
+  with_items:
+    - apt_packages
+
+- name: Enable UFW and reject all traffic on Plex server
+  ufw:
+    state=enabled
+    policy=reject
+
+- name: Enable everything through UFW for local ip range on Plex server
+  ufw:
+    rule=allow
+    src={{ item }}
+  with_items:
+  - 10.0.0.0/8
+  - 192.168.0.0/16
+  - 172.16.0.0/12
