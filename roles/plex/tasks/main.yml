@@ -1,0 +1,46 @@
+---
+# Tasks for Plex role
+
+# Install dependencies for Plex
+
+- name: Install dependencies for Plex
+  action: apt pkg={{ item }} state=present
+  register: result
+  with_items:
+    - avahi-daemon
+    - avahi-utils
+    - libavahi-client3
+    - libavahi-common3
+    - libavahi-core7
+    - libdaemon0
+    - libnss-mdns
+  ignore_errors: yes
+
+- name: Fix install of Plex dependencies
+  command: apt-get -f install
+  when: result|failed
+
+# Install Plex
+
+- name: Download deb package to install Plex
+  get_url:
+    url={{ plex_download_url }}
+    dest={{ plex_download_path }}
+  ignore_errors: yes
+
+- name: Check if Plex is installed
+  command: 'dpkg -s plexmediaserver'
+  register: result
+  changed_when: False
+  ignore_errors: yes
+
+- name: Install Plex
+  command: 'dpkg -i {{ plex_download_path }}'
+  when: result|failed
+
+# Start Plex
+
+- name: Start plexmediaserver service
+  service:
+    name=plexmediaserver
+    state=started

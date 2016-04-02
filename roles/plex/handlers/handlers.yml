@@ -1,0 +1,17 @@
+---
+# Handlers for Plex role
+
+- name: Start plexmediaserver service
+  service:
+    name=plexmediaserver
+    state=started
+
+- name: Stop plexmediaserver service
+  service:
+    name=plexmediaserver
+    state=stopped
+
+- name: Restart plexmediaserver service
+  service:
+    name=plexmediaserver
+    state=restarted
