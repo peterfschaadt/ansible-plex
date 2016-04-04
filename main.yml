@@ -1,0 +1,9 @@
+---
+
+- name: main.yml | All roles
+  hosts: All
+  sudo: True
+
+  roles:
+    - role: ubuntu
+    - role: plex
